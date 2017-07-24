@@ -1,0 +1,146 @@
+﻿<krpano>
+	<action name="startup" autorun="onstart">
+		
+		if(device.panovideosupport == false,
+			error('Sorry, but panoramic videos are not supported by your current browser!');
+		  ,
+			loadscene(videopano);
+		  );
+		set(layer[counttext].visible, false);
+		set(layer[counttexta].visible, false);
+		set(layer[counttextc].visible, true);
+	</action>
+	<plugin name="gyro" devices="html5" keep="true"
+			url="%SWFPATH%/plugins/gyro2.js"
+			enabled="true"
+			camroll="true"
+			friction="0.0"
+			touch_mode="full"
+			sensor_mode="1"
+			softstart="0.5"
+			autocalibration="true"
+			onavailable=""
+			onunavailable=""
+			onenable=""
+			ondisable=""
+	/>
+	<scene name="videopano">
+
+		<!-- include the videoplayer interface / skin (with VR support) -->
+		<include url="skin/videointerface.xml" />
+
+		<action name="setup_video_controls">
+			<!-- add  items to the control menu of the videointerface skin -->
+			videointerface_addmenuitem(configmenu, vqtitle, 'Select Video Quality', true, videointerface_toggle_configmenu() );
+			videointerface_addmenuitem(configmenu, q1, '',  false, change_video_file(q1, 'http://krpano.com/krpanocloud/video/airpano/video-1920x960a.mp4|video-1024x512ssss.webm'); );
+			videointerface_addmenuitem(configmenu, q2, '1920x960',  false, change_video_file(q2, 'http://krpano.com/krpanocloud/video/airpano/video-1920x960a.mp4|video-1920x960ssss.webm'); );
+
+			<!-- select/mark the current video (see the initial videourl attribute) -->
+			if(device.ios,
+			videointerface_selectmenuitem(configmenu, q1);
+			,
+			videointerface_selectmenuitem(configmenu, q2);
+
+			);
+		</action>
+		<action name="videointerface_toggle_configmenu">
+			if(layer[videointerface_configmenu_menu].state == 'closed',
+			if(layer[videointerface_viewmenu_menu].state == 'opened', videointerface_hidemenu(viewmenu) );
+			videointerface_showmenu(configmenu);
+			,
+			videointerface_hidemenu(configmenu);
+			);
+		</action>
+		<action name="hidd_normal">
+			set(layer[counttextc].visible, false);
+			set(layer[counttexta].visible, true);
+			set(layer[counttext].visible, false);
+		</action>
+		<action name="hidd_fisheye">
+			set(layer[counttextc].visible, false);
+			set(layer[counttexta].visible, false);
+			set(layer[counttext].visible, true);
+		</action>
+		<action name="hidd_littleplanet">
+			set(layer[counttextc].visible, true);
+			set(layer[counttexta].visible, false);
+			set(layer[counttext].visible, false);
+		</action>
+		<!-- include the videoplayer plugin -->
+		<plugin name="video"
+		        url.html5="%SWFPATH%/plugins/videoplayer.js"
+		        url.flash="%SWFPATH%/plugins/videoplayer.swf"
+
+				posterurl.ios="video-1024x512-poster.jpg"
+				videourl.ios="http://krpano.com/krpanocloud/video/airpano/video-1920x960ab.mp4|video-1024x512ssfffffss.webm"
+
+				posterurl.no-ios="video-1920x960-poster.jpg"
+				videourl.no-ios="http://krpano.com/krpanocloud/video/airpano/video-1920x960ba.mp4|video-1920x960ssfffffss.webm"
+
+		        pausedonstart="true"
+		        loop="false"
+		        volume="1.0"
+
+		        onloaded="videointerface_setup_interface(get(name));setup_video_controls();add_video_sources();"
+		        />
+		<layer name="bottombargw" type="container" bgcolor="0x0000ff" bgalpha="0" align="topright" width="100" height="120" y="10">
+			<layer name="gyrobutton" url="hdian01.png" scale="0.5" align="centertop" width="130" height="110"
+				   x="3%" y="2%" visible="true"
+				   onclick="switch(plugin[gyro].enabled);"
+			/>
+			<layer name="gyrobutton2" url="hdian02.png" scale="0.5" align="centerbottom" width="130" height="110"
+				   x="3%" y="2%" visible="true"
+				   onclick="webvr.enterVR();"
+			/>
+		</layer>
+
+		<!-- use the videoplayer plugin as panoramic image source -->
+		<layer name="bottombarg" type="container" bgcolor="0x000000" bgalpha="0" align="topleft" width="100" height="10%">
+			 <!--<layer name="gyrobuttong" url="gyroicon.png" scale="0.5" align="right" x="10" visible="true"
+                   onclick="skin_view_littleplanet();"
+            />-->
+			<layer name="counttextc" url="%SWFPATH%/plugins/textfield.swf" vcenter="true" visible="true" alpha="1"
+				   html="正常" autowidth="true" keep="true" autoheight="true" align="leftcenter" x="10" y="0"
+				   padding="15" roundedge="5" state="closed" textshadow="1" textshadowrange="8"
+				   background="false" backgroundcolor="flash" backgroundalpha="1" enabled="true"
+				   border="false" bordercolor="0x000000" borderalpha="1.0" borderwidth="1.0"
+				   css="font-family: Verdana; font-size:16px; color:#fff; text-align:center; line-height:18px;"
+				   onclick="skin_view_normal();hidd_normal()"/>
+			<layer name="counttexta" url="%SWFPATH%/plugins/textfield.swf" vcenter="true" visible="true"
+				   alpha="1" html="鱼眼" autowidth="true" keep="true" autoheight="true" align="center" x="5" y="0"
+				   css="font-family: Verdana; font-size:16px; color:#fff; text-align:center; line-height:16px;"
+				   padding="15" roundedge="5" background="false" backgroundcolor="flash" state="closed"
+				   backgroundalpha="1" border="false" enabled="true" bordercolor="0xFFFFFF" borderalpha="1.0" borderwidth="1.0"
+				   onclick="skin_view_fisheye();hidd_fisheye()"/>
+			<layer name="counttext" url="%SWFPATH%/plugins/textfield.swf" vcenter="true" visible="true"
+				   alpha="1" html="小行星" autowidth="true" keep="true" autoheight="true" align="center" x="5" y="0"
+				   css="font-family: Verdana; font-size:16px; color:#fff; text-align:center; line-height:16px;"
+				   padding="15" roundedge="5" background="false" backgroundcolor="flash" state="closed"
+				   backgroundalpha="1" border="false" enabled="true" bordercolor="0xFFFFFF" borderalpha="1.0" borderwidth="1.0"
+				   onclick="skin_view_littleplanet();hidd_littleplanet()"/>
+
+		</layer>
+
+		<image>
+			<sphere url="plugin:video" />
+		</image>
+
+		<!-- set the default view -->
+		<view hlookat="0" vlookat="0" fovtype="DFOV" fov="130" fovmin="75" fovmax="150" distortion="0.0" />
+
+		<!-- add the video sources and play the video -->
+		<action name="add_video_sources">
+			videointerface_addsource('ceshi', 'http://krpano.com/krpanocloud/video/airpano/video-1920x960a.mp4|%CURRENTXML%/videoffff-1024x512.webm|%CURRENTXML%/iphone-audio.m4a', '%CURRENTXML%/video-1024x512-poster.jpg');
+			videointerface_addsource('1920x960', 'http://krpano.com/krpanocloud/video/airpano/video-1920x960a.mp4|%CURRENTXML%/videfffo-1920x960.webm|%CURRENTXML%/iphone-audio.m4a', '%CURRENTXML%/video-1920x960-poster.jpg');
+			if(device.ios,
+				<!-- iOS Safari has a very slow 'video-to-webgl-texture' transfer, therefore use a low-res video by default -->
+				videointerface_play('');
+			  ,
+				videointerface_play('1920x960');
+			  );
+		</action>
+
+
+	</scene>
+
+</krpano>

@@ -1,0 +1,208 @@
+﻿<krpano>
+	<style name="text" keep="true" url="%SWFPATH%/plugins/textfield.swf" align="center" edge="center" background="false"/>
+	<action name="startup" autorun="onstart">
+		if(device.panovideosupport == false,
+			error('Sorry, but panoramic videos are not supported by your current browser!');
+		  ,
+			loadscene(videopano);
+		  );
+		set(layer[counttext].visible, false);
+		set(layer[counttexta].visible, false);
+		set(layer[counttextc].visible, true);
+	</action>
+	<plugin name="gyro" devices="html5" keep="true"
+			url="%SWFPATH%/plugins/gyro2.js"
+			enabled="true"
+			camroll="true"
+			friction="0.0"
+			touch_mode="full"
+			sensor_mode="1"
+			softstart="0.5"
+			autocalibration="true"
+			onavailable=""
+			onunavailable=""
+			onenable=""
+			ondisable=""
+	/>
+	<scene name="videopano" onstart="set_data_text();">
+
+		<!-- include the videoplayer interface / skin (with VR support) -->
+		<include url="skin/videointerface.xml" />
+
+		<action name="setup_video_controls">
+			<!-- add  items to the control menu of the videointerface skin -->
+			videointerface_addmenuitem(configmenu, vqtitle, 'Select Video Quality', true, videointerface_toggle_configmenu() );
+			videointerface_addmenuitem(configmenu, q1, '1024x512',  false, change_video_file(q1, 'video01.mp4|video-1024x512.webm'); );
+			videointerface_addmenuitem(configmenu, q2, '1920x960',  false, change_video_file(q2, 'video01.mp4|video-1920x960.webm'); );
+
+			<!-- select/mark the current video (see the initial videourl attribute) -->
+			if(device.ios,videointerface_selectmenuitem(configmenu, q1);
+			,videointerface_selectmenuitem(configmenu, q2);
+
+			);
+		</action>
+		<action name="videointerface_toggle_configmenu">
+			if(layer[videointerface_configmenu_menu].state == 'closed',
+			if(layer[videointerface_viewmenu_menu].state == 'opened', videointerface_hidemenu(viewmenu) );
+			videointerface_showmenu(configmenu);
+			,
+			videointerface_hidemenu(configmenu);
+			);
+		</action>
+		<action name="hidd_normal">
+			set(layer[counttextc].visible, false);
+			set(layer[counttexta].visible, true);
+			set(layer[counttext].visible, false);
+		</action>
+		<action name="hidd_fisheye">
+			set(layer[counttextc].visible, false);
+			set(layer[counttexta].visible, false);
+			set(layer[counttext].visible, true);
+		</action>
+		<action name="hidd_littleplanet">
+			set(layer[counttextc].visible, true);
+			set(layer[counttexta].visible, false);
+			set(layer[counttext].visible, false);
+		</action>
+		<!-- include the videoplayer plugin -->
+		<plugin name="video"
+		        url.html5="%SWFPATH%/plugins/videoplayer.js"
+		        url.flash="%SWFPATH%/plugins/videoplayer.swf"
+
+				posterurl.ios=""
+				videourl.ios="video01.mp4"
+
+				posterurl.no-ios=""
+				videourl.no-ios="video01.mp4"
+
+		        pausedonstart="true"
+		        loop="false"
+		        volume="1.0"
+
+		        onloaded="videointerface_setup_interface(get(name));setup_video_controls();add_video_sources();"
+		        />
+		<layer name="bottombargw" type="container" bgcolor="0x0000ff" bgalpha="0" align="topright" width="100" height="120" y="10">
+			<layer name="gyrobutton" url="hdian01.png" scale="0.5" align="centertop" width="130" height="110"
+				   x="3%" y="2%" visible="true"
+				   onclick="switch(plugin[gyro].enabled);"
+			/>
+			<layer name="gyrobutton2" url="hdian02.png" scale="0.5" align="centerbottom" width="130" height="110"
+				   x="3%" y="2%" visible="true"
+				   onclick="webvr.enterVR();"
+			/>
+		</layer>
+		<data name="test">是生生世世</data>
+		<data name="hh">tt</data>
+		<!-- GOLD -->
+		<layer name="container_gradient3" onstart="set_data_text();" type="container" align="center" edge="center" x="0" y="145" width="100%" height="68%" maskchildren="true" scalechildren="true">
+
+			<layer name="gradient31" type="container" align="top" edge="top" width="150%" height="24"
+				   bgcapture="true"
+				   bgcolor="0xFFFFFF"
+				   bgalpha="0"
+				   bgroundedge="0"
+				   bgshadow="0 4 4 0 0xFFFFFF 0 inset, 0 -4 4 0 0xFFFFFF 0 inset"
+			/>
+			<layer name="gradient32" type="container" align="bottom" edge="bottom" width="150%" height="72"
+				   bgcapture="true"
+				   bgcolor="0x000000"
+				   bgalpha="0"
+				   bgroundedge="0"
+				   bgshadow="0 12 12 0.1 0x000000 0 inset, 0 -12 12 0 0x000000 0.3 inset"
+			/>
+			<layer name="text3" url="%SWFPATH%/plugins/textfield.swf" style="text" html="data:test" y="20"
+				   css="font-family:Arial; font-weight:bold; font-size:14px; text-shadow:0px 1px 0px rgba(144, 113, 38, 0.5); color:rgba(255, 255, 255, 1); "/>
+
+			<layer name="text4" url="%SWFPATH%/plugins/textfield.swf" style="text" html="data:hh"
+				   css="font-family:Arial; font-weight:bold; font-size:14px; text-shadow:0px 1px 0px rgba(144, 113, 38, 0.5); color:rgba(255, 255, 255, 1); text-transform: uppercase;"/>
+
+
+		</layer>
+		<!-- use the videoplayer plugin as panoramic image source -->
+		<layer name="bottombarg" onstart="set_preview_url();" type="container" bgcolor="0x000000" bgalpha="0" align="topleft" width="100" height="10%">
+			 <!--<layer name="gyrobuttong" url="gyroicon.png" scale="0.5" align="right" x="10" visible="true"
+                   onclick="skin_view_littleplanet();"
+            />-->
+			<layer name="counttextc" url="%SWFPATH%/plugins/textfield.swf" vcenter="true" visible="true" alpha="1"
+				   html="正常" autowidth="true" keep="true" autoheight="true" align="leftcenter" x="10" y="0"
+				   padding="15" roundedge="5" state="closed" textshadow="1" textshadowrange="8"
+				   background="false" backgroundcolor="flash" backgroundalpha="1" enabled="true"
+				   border="false" bordercolor="0x000000" borderalpha="1.0" borderwidth="1.0"
+				   css="font-family: Verdana; font-size:16px; color:#fff; text-align:center; line-height:18px;"
+				   onclick="skin_view_normal();hidd_normal()"/>
+			<layer name="counttexta" url="%SWFPATH%/plugins/textfield.swf" vcenter="true" visible="true"
+				   alpha="1" html="鱼眼" autowidth="true" keep="true" autoheight="true" align="center" x="5" y="0"
+				   css="font-family: Verdana; font-size:16px; color:#fff; text-align:center; line-height:16px;"
+				   padding="15" roundedge="5" background="false" backgroundcolor="flash" state="closed"
+				   backgroundalpha="1" border="false" enabled="true" bordercolor="0xFFFFFF" borderalpha="1.0" borderwidth="1.0"
+				   onclick="skin_view_fisheye();hidd_fisheye()"/>
+			<layer name="counttext" url="%SWFPATH%/plugins/textfield.swf" vcenter="true" visible="true"
+				   alpha="1" html="小行星" autowidth="true" keep="true" autoheight="true" align="center" x="5" y="0"
+				   css="font-family: Verdana; font-size:16px; color:#fff; text-align:center; line-height:16px;"
+				   padding="15" roundedge="5" background="false" backgroundcolor="flash" state="closed"
+				   backgroundalpha="1" border="false" enabled="true" bordercolor="0xFFFFFF" borderalpha="1.0" borderwidth="1.0"
+				   onclick="skin_view_littleplanet();hidd_littleplanet()"/>
+		</layer>
+
+		<image>
+			<sphere url="plugin:video" />
+		</image>
+
+		<!-- set the default view -->
+		<view hlookat="0" vlookat="0" fovtype="DFOV" fov="130" fovmin="75" fovmax="150" distortion="0.0" />
+
+		<!-- add the video sources and play the video -->
+		<!--<action name="add_video_sources">
+			videointerface_addsource('1024x512', 'video01.mp4|%CURRENTXML%/video-1024x512.webm|%CURRENTXML%/iphone-audio.m4a', '%CURRENTXML%/video-1024x512-poster.jpg');
+			videointerface_addsource('1920x960', 'video01.mp4|%CURRENTXML%/video-1920x960.webm|%CURRENTXML%/iphone-audio.m4a', '%CURRENTXML%/video-1920x960-poster.jpg');
+			if(device.ios,
+				&lt;!&ndash; iOS Safari has a very slow 'video-to-webgl-texture' transfer, therefore use a low-res video by default &ndash;&gt;
+				videointerface_play('1024x512');
+			  ,
+				videointerface_play('1920x960');
+			  );
+		</action>-->
+		<action name="add_video_sources">
+			jsget(vShareImage,"vShareImg");
+			jsget(vShareVideo512,"vShareVideo512");
+			jsget(vShareVideo960,"vShareVideo960");
+			trace(vShareVideo);
+			videointerface_addsource('1024x512', 'get(vShareVideo512)','get(vShareImage)');
+			videointerface_addsource('1920x960', 'get(vShareVideo960)','get(vShareImage)');
+			if(device.ios,
+			<!--- iOS Safari has a very slow 'video-to-webgl-texture' transfer, therefore use a low-res video by default -->
+			videointerface_play('1024x512');
+			,
+			videointerface_play('1920x960');
+			);
+		</action>
+
+	</scene>
+
+	<!--动态设置全景视频-->
+	<!--<action name="add_video_sources">
+		jsget(vShareImage,"vShareImg");
+		jsget(vShareVideo,"vShareVideo");
+
+		&lt;!&ndash;调试信息&ndash;&gt;
+		trace(vShareVideo);
+		&lt;!&ndash;set(image.sphere.url,get(vShareImage));&ndash;&gt;
+		&lt;!&ndash;set(vShareImg,get(vShareImage));&ndash;&gt;
+
+		if(device.ios,
+			playvideo(get(vShareVideo))
+		,
+		&lt;!&ndash;videointerface_play('1920x960');&ndash;&gt;
+			playvideo(get(vShareVideo))
+		);
+
+	</action>-->
+
+	<action name="set_data_text">
+		jsget(vShareText,"vShareText");
+		jsget(vShareText2,"vShareText2");
+		trace(vShareText);
+		set(data[test].content,get(vShareText));
+		set(data[hh].content,get(vShareText2));
+	</action>
+</krpano>
